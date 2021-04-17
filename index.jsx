@@ -13,11 +13,6 @@ const baseConfig = {
   skipStartupTypeset: true,
 };
 
-const defaultSanitizeOptions = {
-  USE_PROFILES: {mathMl: true},
-  ADD_ATTR: ['columnalign'],
-}
-
 const MathJaxPreview = React.forwardRef(({
   script,
   config,
@@ -30,9 +25,7 @@ const MathJaxPreview = React.forwardRef(({
   onDisplay,
   onLoad,
   onError,
-  sanitizeOptions,
 }, ref) => {
-  const sanitizedMath = DOMPurify.sanitize(math, {...defaultSanitizeOptions, ...sanitizeOptions});
   const previewRef = useRef();
   const [display, setDisplay] = useState("none"); //prevent display during processing
   const [loadingState, setLoadingState] = useState(
@@ -75,7 +68,7 @@ const MathJaxPreview = React.forwardRef(({
     if (loadingState !== "loaded") {
       return;
     }
-    previewRef.current.innerHTML = sanitizedMath;
+    previewRef.current.innerHTML = math;
     window.MathJax.Hub.Queue([
       "Typeset",
       window.MathJax.Hub,
@@ -103,7 +96,7 @@ const MathJaxPreview = React.forwardRef(({
       setDisplay("none");
       clearTimeout(timeout);
     };
-  }, [sanitizedMath, loadingState, previewRef]);
+  }, [math, loadingState, previewRef]);
 
   return React.createElement(
     wrapperTag,
@@ -131,14 +124,12 @@ MathJaxPreview.propTypes = {
   onLoad: PropTypes.func,
   onError: PropTypes.func,
   onDisplay: PropTypes.func,
-  sanitizeOptions: PropTypes.object,
 };
 
 MathJaxPreview.defaultProps = {
   script:
     "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_HTMLorMML",
   id: "react-mathjax-preview",
-  sanitizeOptions: {},
   wrapperTag: "div",
 };
 
